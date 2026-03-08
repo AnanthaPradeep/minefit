@@ -9,12 +9,19 @@ import { useAppStore } from "@/state/store";
 export default function HomePage() {
   const navigate = useNavigate();
   const user = useAppStore((state) => state.currentUser);
+  const hasSeenOnboarding = useAppStore((state) => state.onboarding.hasSeen);
 
   useEffect(() => {
     if (user) {
       navigate("/dashboard", { replace: true });
+      return;
     }
-  }, [user, navigate]);
+    if (hasSeenOnboarding) {
+      navigate("/setup", { replace: true });
+      return;
+    }
+    navigate("/onboarding", { replace: true });
+  }, [hasSeenOnboarding, user, navigate]);
 
   return (
     <div className="min-h-screen px-4 py-8">
@@ -30,9 +37,9 @@ export default function HomePage() {
           <li>• Workout, yoga, reminders, and progress tracking</li>
         </ul>
 
-        <Link to="/setup" className="mt-6 block">
+        <Link to="/onboarding" className="mt-6 block">
           <Button className="w-full" size="lg">
-            Start Setup
+            Start Onboarding
           </Button>
         </Link>
       </Card>

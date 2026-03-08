@@ -19,13 +19,14 @@ const goals: { label: string; value: FitnessGoal }[] = [
 export default function SetupPage() {
   const navigate = useNavigate();
   const createOrUpdateProfile = useAppStore((state) => state.createOrUpdateProfile);
+  const starterGoal = useAppStore((state) => state.onboarding.starterGoal);
   const [form, setForm] = useState({
     name: "",
     age: 25,
     height: 165,
     weight: 68,
     gender: "other" as "male" | "female" | "other",
-    fitnessGoal: "maintain_health" as FitnessGoal,
+    fitnessGoal: (starterGoal ?? "maintain_health") as FitnessGoal,
   });
 
   return (

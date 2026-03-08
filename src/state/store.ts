@@ -12,6 +12,7 @@ import type {
   AppSettings,
   DietRegion,
   Exercise,
+  FitnessGoal,
   HydrationEntry,
   MeasurementEntry,
   MealEntry,
@@ -28,6 +29,7 @@ import type {
   Reminder,
   ReminderScheduleType,
   ReminderType,
+  OnboardingState,
   UserProfile,
   WeeklyPlan,
   WorkoutLog,
@@ -135,6 +137,7 @@ interface UiState {
 
 interface AppState {
   hydrated: boolean;
+  onboarding: OnboardingState;
   currentUser: UserProfile | null;
   meals: MealEntry[];
   weeklyPlans: WeeklyPlan[];
@@ -219,6 +222,7 @@ interface AppState {
   importData: (payload: AppExportPayload) => Promise<void>;
   clearAllData: () => Promise<void>;
   setDarkMode: (enabled: boolean) => Promise<void>;
+  completeOnboarding: (payload?: { skipped?: boolean; starterGoal?: FitnessGoal }) => void;
 }
 
 const baseSettings = (userId: string): AppSettings => ({
@@ -266,6 +270,10 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       hydrated: false,
+      onboarding: {
+        hasSeen: false,
+        skipped: false,
+      },
       currentUser: null,
       meals: [],
       weeklyPlans: [],
@@ -380,7 +388,20 @@ export const useAppStore = create<AppState>()(
           await db.settings.put(settings);
         }
 
-        set({ currentUser: user, settings, ui: { darkMode: settings.darkMode } });
+        const currentOnboarding = get().onboarding;
+        const onboarding: OnboardingState = currentOnboarding.hasSeen
+          ? {
+              ...currentOnboarding,
+              starterGoal: currentOnboarding.starterGoal ?? data.fitnessGoal,
+            }
+          : {
+              hasSeen: true,
+              skipped: false,
+              completedAt: now,
+              starterGoal: data.fitnessGoal,
+            };
+
+        set({ currentUser: user, settings, ui: { darkMode: settings.darkMode }, onboarding });
       },
 
       addMeal: async (mealType, foodNames, date, options) => {
@@ -929,6 +950,10 @@ export const useAppStore = create<AppState>()(
         ]);
 
         set({
+          onboarding: {
+            hasSeen: false,
+            skipped: false,
+          },
           currentUser: null,
           meals: [],
           weeklyPlans: [],
@@ -948,6 +973,18 @@ export const useAppStore = create<AppState>()(
           settings: null,
           ui: { darkMode: false },
         });
+      },
+
+      completeOnboarding: (payload) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          onboarding: {
+            hasSeen: true,
+            skipped: payload?.skipped ?? state.onboarding.skipped,
+            completedAt: now,
+            starterGoal: payload?.starterGoal ?? state.onboarding.starterGoal,
+          },
+        }));
       },
 
       setDarkMode: async (enabled) => {
@@ -976,7 +1013,7 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "minefit-ui",
-      partialize: (state) => ({ ui: state.ui }),
+      partialize: (state) => ({ ui: state.ui, onboarding: state.onboarding }),
     },
   ),
 );

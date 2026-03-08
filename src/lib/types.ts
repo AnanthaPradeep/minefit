@@ -264,6 +264,13 @@ export interface AppSettings {
   units: "metric" | "imperial";
 }
 
+export interface OnboardingState {
+  hasSeen: boolean;
+  skipped: boolean;
+  completedAt?: string;
+  starterGoal?: FitnessGoal;
+}
+
 export interface AppExportPayload {
   user: UserProfile | null;
   meals: MealEntry[];

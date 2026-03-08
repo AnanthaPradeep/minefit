@@ -7,7 +7,7 @@ import { Activity, Bell, Dumbbell, House, Menu, Salad, Settings, Waves, X } from
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { cn } from "@/lib/utils";
 
-const hideNavExact = ["/"];
+const hideNavExact = ["/", "/onboarding"];
 const hideNavPrefix = ["/setup"];
 
 const navItems = [
