@@ -1,0 +1,36 @@
+{
+  "image_seed_prefix": "minefit-yoga",
+  "beginner": [
+    "Tadasana",
+    "Vrikshasana",
+    "Bhujangasana",
+    "Balasana",
+    "Sukhasana"
+  ],
+  "intermediate": [
+    "Trikonasana",
+    "Utkatasana",
+    "Warrior I",
+    "Warrior II",
+    "Bridge Pose"
+  ],
+  "advanced": [
+    "Crow Pose",
+    "Headstand",
+    "Handstand",
+    "Wheel Pose",
+    "King Pigeon Pose"
+  ],
+  "relaxation": [
+    "Savasana",
+    "Legs Up The Wall",
+    "Supine Twist",
+    "Happy Baby Pose"
+  ],
+  "digestion": [
+    "Vajrasana",
+    "Cat Cow Pose",
+    "Seated Twist",
+    "Wind Relieving Pose"
+  ]
+}

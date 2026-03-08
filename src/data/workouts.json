@@ -1,0 +1,121 @@
+{
+  "image_seed_prefix": "minefit-workout",
+  "pre_meal": [
+    "Jumping Jacks",
+    "High Knees",
+    "Butt Kicks",
+    "Arm Circles",
+    "Torso Twists",
+    "Bodyweight Squats",
+    "Mountain Climbers",
+    "Plank",
+    "Standing Forward Bend",
+    "Side Stretch",
+    "Neck Rotation",
+    "Shoulder Rolls",
+    "Spot Jogging",
+    "Shadow Boxing"
+  ],
+  "post_meal": [
+    "Walking",
+    "Light Stretching",
+    "Seated Twists",
+    "Cat Cow Stretch",
+    "Gentle Yoga"
+  ],
+  "free_hand": {
+    "upper_body": [
+      "Push Ups",
+      "Wide Push Ups",
+      "Diamond Push Ups",
+      "Pike Push Ups",
+      "Decline Push Ups"
+    ],
+    "lower_body": [
+      "Squats",
+      "Lunges",
+      "Jump Squats",
+      "Bulgarian Split Squats",
+      "Wall Sit"
+    ],
+    "core": [
+      "Plank",
+      "Side Plank",
+      "Russian Twists",
+      "Leg Raises",
+      "Bicycle Crunch"
+    ],
+    "full_body": [
+      "Burpees",
+      "Mountain Climbers",
+      "Jumping Jacks",
+      "Bear Crawl",
+      "High Knees"
+    ]
+  },
+  "dumbbell": {
+    "chest": [
+      "Dumbbell Bench Press",
+      "Dumbbell Fly"
+    ],
+    "shoulders": [
+      "Shoulder Press",
+      "Lateral Raise",
+      "Front Raise",
+      "Reverse Fly"
+    ],
+    "back": [
+      "Bent Over Row",
+      "Renegade Row"
+    ],
+    "arms": [
+      "Bicep Curl",
+      "Hammer Curl",
+      "Concentration Curl",
+      "Tricep Kickback",
+      "Overhead Tricep Extension"
+    ],
+    "legs": [
+      "Goblet Squat",
+      "Dumbbell Lunges",
+      "Dumbbell Deadlift",
+      "Dumbbell Step Up"
+    ]
+  },
+  "resistance_band": [
+    "Band Squats",
+    "Band Chest Press",
+    "Band Rows",
+    "Band Bicep Curl",
+    "Band Tricep Pushdown",
+    "Band Lateral Walk"
+  ],
+  "kettlebell": [
+    "Kettlebell Swing",
+    "Goblet Squat",
+    "Kettlebell Clean",
+    "Turkish Get Up",
+    "Kettlebell Snatch"
+  ],
+  "gym_barbell": [
+    "Bench Press",
+    "Deadlift",
+    "Squat",
+    "Overhead Press",
+    "Barbell Row"
+  ],
+  "gym_machine": [
+    "Leg Press",
+    "Lat Pulldown",
+    "Cable Row",
+    "Pec Deck",
+    "Leg Curl"
+  ],
+  "cardio": [
+    "Running",
+    "Cycling",
+    "Jump Rope",
+    "Rowing",
+    "Stair Climbing"
+  ]
+}
