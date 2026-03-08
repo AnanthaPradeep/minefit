@@ -222,6 +222,7 @@ interface AppState {
   importData: (payload: AppExportPayload) => Promise<void>;
   clearAllData: () => Promise<void>;
   setDarkMode: (enabled: boolean) => Promise<void>;
+  setUnits: (units: AppSettings["units"]) => Promise<void>;
   completeOnboarding: (payload?: { skipped?: boolean; starterGoal?: FitnessGoal }) => void;
 }
 
@@ -375,10 +376,11 @@ export const useAppStore = create<AppState>()(
       createOrUpdateProfile: async (data) => {
         const now = new Date().toISOString();
         const existing = get().currentUser;
+        const avatarUrl = data.avatarUrl?.trim();
 
         const user: UserProfile = existing
-          ? { ...existing, ...data, updatedAt: now }
-          : { id: uid("user"), ...data, createdAt: now, updatedAt: now };
+          ? { ...existing, ...data, avatarUrl: avatarUrl || undefined, updatedAt: now }
+          : { id: uid("user"), ...data, avatarUrl: avatarUrl || undefined, createdAt: now, updatedAt: now };
 
         await db.users.put(user);
 
@@ -1009,6 +1011,29 @@ export const useAppStore = create<AppState>()(
         const updated = { ...settings!, darkMode: enabled };
         await db.settings.put(updated);
         set({ settings: updated, ui: { darkMode: enabled } });
+      },
+
+      setUnits: async (units) => {
+        const settings = get().settings;
+        const currentUser = get().currentUser;
+
+        if (!settings && !currentUser) {
+          return;
+        }
+
+        if (!settings && currentUser) {
+          const created = {
+            ...baseSettings(currentUser.id),
+            units,
+          };
+          await db.settings.put(created);
+          set({ settings: created, ui: { darkMode: created.darkMode } });
+          return;
+        }
+
+        const updated = { ...settings!, units };
+        await db.settings.put(updated);
+        set({ settings: updated, ui: { darkMode: updated.darkMode } });
       },
     }),
     {

@@ -32,6 +32,7 @@ export type ReminderPriority = "low" | "medium" | "high";
 export interface UserProfile {
   id: string;
   name: string;
+  avatarUrl?: string;
   age: number;
   height: number;
   weight: number;

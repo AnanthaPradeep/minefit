@@ -19,6 +19,7 @@ import YogaPracticePage from "@/app/yoga/practice/page";
 import ProgressPage from "@/app/progress/page";
 import ReminderPage from "@/app/reminders/page";
 import SettingsPage from "@/app/settings/page";
+import ProfileSettingsPage from "@/app/settings/profile/page";
 import PrivacyPage from "@/app/privacy/page";
 import TermsPage from "@/app/terms/page";
 import SupportPage from "@/app/support/page";
@@ -83,6 +84,7 @@ export function App() {
             <Route path="/progress" element={<RequireProfile><ProgressPage /></RequireProfile>} />
             <Route path="/reminders" element={<RequireProfile><ReminderPage /></RequireProfile>} />
             <Route path="/settings" element={<RequireProfile><SettingsPage /></RequireProfile>} />
+            <Route path="/settings/profile" element={<RequireProfile><ProfileSettingsPage /></RequireProfile>} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/support" element={<SupportPage />} />

@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import type { AppExportPayload } from "@/lib/types";
 import { useAppStore } from "@/state/store";
 
 export default function SettingsPage() {
+  const [searchParams] = useSearchParams();
   const user = useAppStore((state) => state.currentUser);
   const darkMode = useAppStore((state) => state.ui.darkMode);
   const setDarkMode = useAppStore((state) => state.setDarkMode);
@@ -22,6 +23,8 @@ export default function SettingsPage() {
     element?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
+  const profileUpdated = searchParams.get("updated") === "profile";
+
   return (
     <div className="space-y-4">
       <Card>
@@ -31,10 +34,11 @@ export default function SettingsPage() {
 
       <Card>
         <CardTitle>Profile</CardTitle>
+        {profileUpdated ? <CardDescription className="mt-1 text-emerald-700 dark:text-emerald-300">Profile updated successfully.</CardDescription> : null}
         <CardDescription className="mt-2">
           {user ? `${user.name} • ${user.age} yrs • ${user.height} cm • ${user.weight} kg` : "No profile setup yet"}
         </CardDescription>
-        <Link to="/setup" className="mt-3 block">
+        <Link to="/settings/profile" className="mt-3 block">
           <Button className="w-full" variant="outline">
             Edit Profile
           </Button>
