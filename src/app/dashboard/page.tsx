@@ -40,103 +40,109 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardTitle>Today&apos;s Meals</CardTitle>
-        <CardDescription className="mt-1">Morning, afternoon, evening snack, and night</CardDescription>
-        <div className="mt-3 space-y-2 text-sm">
-          {meals.length === 0 ? <p className="text-zinc-500 dark:text-zinc-400">No meals added today.</p> : null}
-          {meals.map((meal) => (
-            <MediaCard
-              key={meal.id}
-              compact
-              showImage={false}
-              title={meal.mealType}
-              subtitle={meal.foodItems.map((item) => item.name).join(", ")}
-              metaLeft={`${meal.calories} kcal`}
-              metaRight={`${meal.protein}g protein`}
-            />
-          ))}
-        </div>
-      </Card>
+      <div className="grid grid-cols-2 gap-4">
+        <Card>
+          <CardTitle>Today&apos;s Meals</CardTitle>
+          <CardDescription className="mt-1">Morning, afternoon, evening snack, and night</CardDescription>
+          <div className="mt-3 space-y-2 text-sm">
+            {meals.length === 0 ? <p className="text-zinc-500 dark:text-zinc-400">No meals added today.</p> : null}
+            {meals.map((meal) => (
+              <MediaCard
+                key={meal.id}
+                compact
+                showImage={false}
+                title={meal.mealType}
+                subtitle={meal.foodItems.map((item) => item.name).join(", ")}
+                metaLeft={`${meal.calories} kcal`}
+                metaRight={`${meal.protein}g protein`}
+              />
+            ))}
+          </div>
+        </Card>
 
-      <Card>
-        <CardTitle>Today&apos;s Workout</CardTitle>
-        <CardDescription className="mt-1">Exercise list and quick start</CardDescription>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <Link to="/workouts">
-            <Button className="w-full">Start Workout</Button>
-          </Link>
-          <Link to="/yoga">
-            <Button variant="secondary" className="w-full">
-              Start Yoga
-            </Button>
-          </Link>
-        </div>
-      </Card>
+        <Card>
+          <CardTitle>Today&apos;s Workout</CardTitle>
+          <CardDescription className="mt-1">Exercise list and quick start</CardDescription>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Link to="/workouts">
+              <Button className="w-full">Start Workout</Button>
+            </Link>
+            <Link to="/yoga">
+              <Button variant="secondary" className="w-full">
+                Start Yoga
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      </div>
 
-      <DashboardMusicPlayerCard />
+      <div className="grid grid-cols-2 gap-4">
+        <DashboardMusicPlayerCard />
 
-      <Card>
-        <CardTitle>Quick Actions</CardTitle>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <Link to="/diet">
-            <Button className="w-full" variant="outline">
-              <Utensils className="mr-2 h-4 w-4" /> Add Meal
-            </Button>
-          </Link>
-          <Link to="/workouts">
-            <Button className="w-full" variant="outline">
-              <Flame className="mr-2 h-4 w-4" /> Start Workout
-            </Button>
-          </Link>
-          <Link to="/yoga">
-            <Button className="w-full" variant="outline">
-              Start Yoga
-            </Button>
-          </Link>
-          <Link to="/dashboard#timer">
-            <Button className="w-full" variant="outline">
-              <Timer className="mr-2 h-4 w-4" /> Start Timer
-            </Button>
-          </Link>
-        </div>
-      </Card>
+        <div className="space-y-4">
+          <Card>
+            <CardTitle>Quick Actions</CardTitle>
+            <div className="mt-3 grid grid-cols-1 gap-2">
+              <Link to="/diet">
+                <Button className="w-full" variant="outline">
+                  <Utensils className="mr-2 h-4 w-4" /> Add Meal
+                </Button>
+              </Link>
+              <Link to="/workouts">
+                <Button className="w-full" variant="outline">
+                  <Flame className="mr-2 h-4 w-4" /> Start Workout
+                </Button>
+              </Link>
+              <Link to="/yoga">
+                <Button className="w-full" variant="outline">
+                  Start Yoga
+                </Button>
+              </Link>
+              <Link to="/dashboard#timer">
+                <Button className="w-full" variant="outline">
+                  <Timer className="mr-2 h-4 w-4" /> Start Timer
+                </Button>
+              </Link>
+            </div>
+          </Card>
 
-      <Card>
-        <CardTitle>Progress Summary</CardTitle>
-        <div className="mt-3 grid grid-cols-2 gap-2 text-sm md:grid-cols-5">
-          <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
-            <p className="text-zinc-500 dark:text-zinc-400">Streak</p>
-            <p className="text-lg font-bold">{streak}</p>
-          </div>
-          <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
-            <p className="text-zinc-500 dark:text-zinc-400">Weekly</p>
-            <p className="text-lg font-bold">{weeklyCount}</p>
-          </div>
-          <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
-            <p className="text-zinc-500 dark:text-zinc-400">Minutes</p>
-            <p className="text-lg font-bold">{weeklyMinutes}</p>
-          </div>
-          <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
-            <p className="text-zinc-500 dark:text-zinc-400">Adherence</p>
-            <p className="text-lg font-bold">{adherence?.completionRate ?? 0}%</p>
-          </div>
-          <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
-            <p className="text-zinc-500 dark:text-zinc-400">Calories</p>
-            <p className="text-lg font-bold">{calories}</p>
-          </div>
-          <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
-            <p className="text-zinc-500 dark:text-zinc-400">Water</p>
-            <p className="text-lg font-bold">{dietSummary.hydrationMl} ml</p>
-          </div>
-          <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
-            <p className="text-zinc-500 dark:text-zinc-400">BMI</p>
-            <p className="text-lg font-bold">{bmi ?? "--"}</p>
-            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{bmiInsight.label} ({bmiInsight.range})</p>
-            <p className={`text-[10px] font-medium ${getBmiRiskToneClass(bmiInsight.risk)}`}>Risk: {bmiInsight.risk}</p>
-          </div>
+          <Card>
+            <CardTitle>Progress Summary</CardTitle>
+            <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+              <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
+                <p className="text-zinc-500 dark:text-zinc-400">Streak</p>
+                <p className="text-lg font-bold">{streak}</p>
+              </div>
+              <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
+                <p className="text-zinc-500 dark:text-zinc-400">Weekly</p>
+                <p className="text-lg font-bold">{weeklyCount}</p>
+              </div>
+              <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
+                <p className="text-zinc-500 dark:text-zinc-400">Minutes</p>
+                <p className="text-lg font-bold">{weeklyMinutes}</p>
+              </div>
+              <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
+                <p className="text-zinc-500 dark:text-zinc-400">Adherence</p>
+                <p className="text-lg font-bold">{adherence?.completionRate ?? 0}%</p>
+              </div>
+              <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
+                <p className="text-zinc-500 dark:text-zinc-400">Calories</p>
+                <p className="text-lg font-bold">{calories}</p>
+              </div>
+              <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
+                <p className="text-zinc-500 dark:text-zinc-400">Water</p>
+                <p className="text-lg font-bold">{dietSummary.hydrationMl} ml</p>
+              </div>
+              <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
+                <p className="text-zinc-500 dark:text-zinc-400">BMI</p>
+                <p className="text-lg font-bold">{bmi ?? "--"}</p>
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{bmiInsight.label} ({bmiInsight.range})</p>
+                <p className={`text-[10px] font-medium ${getBmiRiskToneClass(bmiInsight.risk)}`}>Risk: {bmiInsight.risk}</p>
+              </div>
+            </div>
+          </Card>
         </div>
-      </Card>
+      </div>
 
       {latestMilestone ? (
         <MediaCard

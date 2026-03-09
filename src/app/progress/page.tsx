@@ -55,6 +55,8 @@ export default function ProgressPage() {
   const currentGoal = goals[0];
 
   const currentAdherence = adherenceSnapshots[0];
+  const adherenceCompleted = currentAdherence?.completedSessions ?? 0;
+  const adherenceTarget = currentAdherence?.targetSessions ?? (currentGoal?.weeklyTargetSessions ?? 4);
   const weeklyMinutes = getWeeklyActiveMinutes(logs);
   const minutesGap = (currentGoal?.weeklyTargetMinutes ?? 150) - weeklyMinutes;
 
@@ -77,7 +79,7 @@ export default function ProgressPage() {
         <CardDescription className="mt-1">Weight, measurements, adherence, goals, milestones, and photo timeline</CardDescription>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-5">
         <Card className="xl:col-span-2">
           <CardTitle>Add Weight Entry</CardTitle>
           <div className="mt-3 flex gap-2">
@@ -122,113 +124,127 @@ export default function ProgressPage() {
 
         <Card>
           <CardTitle>Adherence</CardTitle>
-          <p className="mt-2 text-3xl font-bold">{currentAdherence?.completionRate ?? 0}%</p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Sessions completion this week</p>
+          <div className="mt-3 flex flex-col items-center text-center">
+            <div className="rounded-full bg-zinc-100 px-4 py-2 dark:bg-zinc-800">
+              <p className="text-3xl font-bold">{currentAdherence?.completionRate ?? 0}%</p>
+            </div>
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              Sessions this week: {adherenceCompleted}/{adherenceTarget}
+            </p>
+          </div>
         </Card>
       </div>
 
-      <Card>
-        <CardTitle>Goal Settings</CardTitle>
-        <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
-          <Input type="number" value={targetWeight} onChange={(event) => setTargetWeight(Number(event.target.value))} placeholder="Target Weight (kg)" />
-          <Input type="date" value={targetDate} onChange={(event) => setTargetDate(event.target.value)} />
-          <Input type="number" value={weeklyTargetMinutes} onChange={(event) => setWeeklyTargetMinutes(Number(event.target.value))} placeholder="Weekly Minutes" />
-          <Input type="number" value={weeklyTargetSessions} onChange={(event) => setWeeklyTargetSessions(Number(event.target.value))} placeholder="Weekly Sessions" />
-        </div>
-        <Button
-          className="mt-3 w-full md:w-auto"
-          onClick={() =>
-            upsertProgressGoal({
-              targetWeight,
-              targetDate: targetDate || undefined,
-              weeklyTargetMinutes,
-              weeklyTargetSessions,
-            })
-          }
-        >
-          Save Goal
-        </Button>
-        {currentGoal ? (
-          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-            Active goal: {currentGoal.targetWeight ?? "-"} kg by {currentGoal.targetDate ?? "No date"} • {currentGoal.weeklyTargetMinutes} min/week • {currentGoal.weeklyTargetSessions} sessions/week
-          </p>
-        ) : null}
-      </Card>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <Card>
+          <CardTitle>Goal Settings</CardTitle>
+          <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-4">
+            <Input type="number" value={targetWeight} onChange={(event) => setTargetWeight(Number(event.target.value))} placeholder="Target Weight (kg)" />
+            <Input type="date" value={targetDate} onChange={(event) => setTargetDate(event.target.value)} />
+            <Input type="number" value={weeklyTargetMinutes} onChange={(event) => setWeeklyTargetMinutes(Number(event.target.value))} placeholder="Weekly Minutes" />
+            <Input type="number" value={weeklyTargetSessions} onChange={(event) => setWeeklyTargetSessions(Number(event.target.value))} placeholder="Weekly Sessions" />
+          </div>
+          <Button
+            className="mt-3 w-full md:w-auto"
+            onClick={() =>
+              upsertProgressGoal({
+                targetWeight,
+                targetDate: targetDate || undefined,
+                weeklyTargetMinutes,
+                weeklyTargetSessions,
+              })
+            }
+          >
+            Save Goal
+          </Button>
+          {currentGoal ? (
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              Active goal: {currentGoal.targetWeight ?? "-"} kg by {currentGoal.targetDate ?? "No date"} • {currentGoal.weeklyTargetMinutes} min/week • {currentGoal.weeklyTargetSessions} sessions/week
+            </p>
+          ) : null}
+        </Card>
 
-      <Card>
-        <CardTitle>Body Measurements</CardTitle>
-        <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-4">
-          <Input type="number" value={waist} onChange={(event) => setWaist(Number(event.target.value))} placeholder="Waist (cm)" />
-          <Input type="number" value={chest} onChange={(event) => setChest(Number(event.target.value))} placeholder="Chest (cm)" />
-          <Input type="number" value={hips} onChange={(event) => setHips(Number(event.target.value))} placeholder="Hips (cm)" />
-          <Button onClick={() => addMeasurementEntry({ waist, chest, hips, date: todayISO() })}>Save Measurements</Button>
-        </div>
-        <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
-          {measurementCards.map((item) => (
-            <MediaCard
-              key={item.label}
-              compact
-              showImage={false}
-              title={item.label}
-              subtitle={item.value ? `${item.value} cm` : "No data"}
-              metaLeft="Latest"
-              metaRight={latestMeasurement?.date ?? "-"}
-            />
-          ))}
-        </div>
-      </Card>
+        <Card>
+          <CardTitle>Body Measurements</CardTitle>
+          <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-4">
+            <Input type="number" value={waist} onChange={(event) => setWaist(Number(event.target.value))} placeholder="Waist (cm)" />
+            <Input type="number" value={chest} onChange={(event) => setChest(Number(event.target.value))} placeholder="Chest (cm)" />
+            <Input type="number" value={hips} onChange={(event) => setHips(Number(event.target.value))} placeholder="Hips (cm)" />
+            <Button onClick={() => addMeasurementEntry({ waist, chest, hips, date: todayISO() })}>Save Measurements</Button>
+          </div>
+          <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
+            {measurementCards.map((item) => (
+              <MediaCard
+                key={item.label}
+                compact
+                showImage={false}
+                title={item.label}
+                subtitle={item.value ? `${item.value} cm` : "No data"}
+                metaLeft="Latest"
+                metaRight={latestMeasurement?.date ?? "-"}
+              />
+            ))}
+          </div>
+        </Card>
+      </div>
 
-      <Card>
-        <CardTitle>Weight Chart</CardTitle>
-        <div className="mt-2 flex gap-2">
-          {[7, 30, 90].map((value) => (
-            <Button key={value} size="sm" variant={range === value ? "default" : "outline"} onClick={() => setRange(value as 7 | 30 | 90)}>
-              {value}d
-            </Button>
-          ))}
-        </div>
-        <WeightChart data={progress} range={range} />
-      </Card>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <Card>
+          <CardTitle>Weight Chart</CardTitle>
+          <div className="mt-2 flex gap-2">
+            {[7, 30, 90].map((value) => (
+              <Button key={value} size="sm" variant={range === value ? "default" : "outline"} onClick={() => setRange(value as 7 | 30 | 90)}>
+                {value}d
+              </Button>
+            ))}
+          </div>
+          <WeightChart data={progress} range={range} />
+        </Card>
 
-      <Card>
-        <CardTitle>BMI Trend</CardTitle>
-        <CardDescription className="mt-1">Calculated from your saved weight entries and profile height</CardDescription>
-        <BmiChart data={progress} heightCm={user?.height ?? 165} range={range} />
-        <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">BMI is a screening metric, not a diagnosis.</p>
-      </Card>
+        <Card>
+          <CardTitle>BMI Trend</CardTitle>
+          <CardDescription className="mt-1">Calculated from your saved weight entries and profile height</CardDescription>
+          <BmiChart data={progress} heightCm={user?.height ?? 165} range={range} />
+          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">BMI is a screening metric, not a diagnosis.</p>
+        </Card>
+      </div>
 
-      <Card>
-        <CardTitle>Weekly Workout Graph</CardTitle>
-        <WeeklyWorkoutChart logs={logs} />
-      </Card>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <Card>
+          <CardTitle>Weekly Workout Graph</CardTitle>
+          <WeeklyWorkoutChart logs={logs} />
+        </Card>
 
-      <Card>
-        <CardTitle>Adherence Trend</CardTitle>
-        <AdherenceChart data={adherenceSnapshots} />
-      </Card>
+        <Card>
+          <CardTitle>Adherence Trend</CardTitle>
+          <AdherenceChart data={adherenceSnapshots} />
+        </Card>
+      </div>
 
-      <Card>
-        <CardTitle>Activity vs Target</CardTitle>
-        <ActivityMinutesChart logs={logs} targetMinutes={currentGoal?.weeklyTargetMinutes ?? 150} />
-      </Card>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <Card>
+          <CardTitle>Activity vs Target</CardTitle>
+          <ActivityMinutesChart logs={logs} targetMinutes={currentGoal?.weeklyTargetMinutes ?? 150} />
+        </Card>
 
-      <Card>
-        <CardTitle>Milestones</CardTitle>
-        <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
-          {milestones.length === 0 ? <p className="text-sm text-zinc-500 dark:text-zinc-400">No milestones yet.</p> : null}
-          {milestones.slice(0, 6).map((milestone) => (
-            <MediaCard
-              key={milestone.id}
-              compact
-              showImage={false}
-              title={milestone.title}
-              subtitle={milestone.detail}
-              metaLeft={milestone.type.replace("_", " ")}
-              metaRight={milestone.date}
-            />
-          ))}
-        </div>
-      </Card>
+        <Card>
+          <CardTitle>Milestones</CardTitle>
+          <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
+            {milestones.length === 0 ? <p className="text-sm text-zinc-500 dark:text-zinc-400">No milestones yet.</p> : null}
+            {milestones.slice(0, 6).map((milestone) => (
+              <MediaCard
+                key={milestone.id}
+                compact
+                showImage={false}
+                title={milestone.title}
+                subtitle={milestone.detail}
+                metaLeft={milestone.type.replace("_", " ")}
+                metaRight={milestone.date}
+              />
+            ))}
+          </div>
+        </Card>
+      </div>
 
       <Card>
         <CardTitle>Progress Photos</CardTitle>

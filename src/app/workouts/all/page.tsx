@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { MediaCard } from "@/components/feature/media-card";
 import { useAppStore } from "@/state/store";
@@ -34,19 +35,28 @@ const labels: Record<ExerciseCategory, string> = {
 export default function AllExercisesPage() {
   const all = useAppStore((state) => state.exerciseLibrary).filter((item) => item.category !== "yoga");
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [difficulty, setDifficulty] = useState("all");
+  const [equipment, setEquipment] = useState("all");
+  const [timing, setTiming] = useState("all");
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    if (!normalized) return all;
+
     return all.filter((exercise) => {
       const muscles = Array.isArray(exercise.targetMuscles) ? exercise.targetMuscles.join(" ") : "";
-      return (
+      const matchesSearch =
+        !normalized ||
         exercise.name.toLowerCase().includes(normalized) ||
         muscles.toLowerCase().includes(normalized) ||
-        exercise.category.toLowerCase().includes(normalized)
-      );
+        exercise.category.toLowerCase().includes(normalized);
+      const matchesCategory = category === "all" || exercise.category === category;
+      const matchesDifficulty = difficulty === "all" || exercise.difficulty === difficulty;
+      const matchesEquipment = equipment === "all" || exercise.equipment === equipment;
+      const matchesTiming = timing === "all" || exercise.workoutTiming === timing;
+      return matchesSearch && matchesCategory && matchesDifficulty && matchesEquipment && matchesTiming;
     });
-  }, [all, query]);
+  }, [all, category, difficulty, equipment, query, timing]);
 
   const grouped = useMemo(() => {
     const map = new Map<ExerciseCategory, typeof filtered>();
@@ -71,6 +81,53 @@ export default function AllExercisesPage() {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
         />
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <select className="h-10 rounded-lg border border-zinc-300 px-2 text-sm dark:border-zinc-700 dark:bg-zinc-900" value={category} onChange={(event) => setCategory(event.target.value)}>
+            <option value="all">All Categories</option>
+            <option value="pre_meal">Pre-Meal</option>
+            <option value="post_meal">Post-Meal</option>
+            <option value="free_hand">Free Hand</option>
+            <option value="dumbbell">Dumbbell</option>
+            <option value="resistance_band">Resistance Band</option>
+            <option value="kettlebell">Kettlebell</option>
+            <option value="gym_barbell">Gym Barbell</option>
+            <option value="gym_machine">Gym Machine</option>
+            <option value="cardio">Cardio</option>
+          </select>
+          <select className="h-10 rounded-lg border border-zinc-300 px-2 text-sm dark:border-zinc-700 dark:bg-zinc-900" value={difficulty} onChange={(event) => setDifficulty(event.target.value)}>
+            <option value="all">All Difficulty</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+          <select className="h-10 rounded-lg border border-zinc-300 px-2 text-sm dark:border-zinc-700 dark:bg-zinc-900" value={equipment} onChange={(event) => setEquipment(event.target.value)}>
+            <option value="all">All Equipment</option>
+            <option value="bodyweight">Bodyweight</option>
+            <option value="dumbbell">Dumbbell</option>
+            <option value="resistance-band">Resistance Band</option>
+            <option value="barbell">Barbell</option>
+            <option value="machine">Machine</option>
+          </select>
+          <select className="h-10 rounded-lg border border-zinc-300 px-2 text-sm dark:border-zinc-700 dark:bg-zinc-900" value={timing} onChange={(event) => setTiming(event.target.value)}>
+            <option value="all">All Workout Timing</option>
+            <option value="pre-meal">Pre-Meal</option>
+            <option value="post-meal">Post-Meal</option>
+            <option value="anytime">Anytime</option>
+          </select>
+          <Button
+            className="col-span-2"
+            variant="outline"
+            onClick={() => {
+              setQuery("");
+              setCategory("all");
+              setDifficulty("all");
+              setEquipment("all");
+              setTiming("all");
+            }}
+          >
+            Reset Filters
+          </Button>
+        </div>
       </Card>
 
       {categoryOrder.map((category) => {
@@ -104,6 +161,12 @@ export default function AllExercisesPage() {
           </Card>
         );
       })}
+
+      {filtered.length === 0 ? (
+        <Card>
+          <CardDescription>No exercises match current filters. Try adjusting or resetting filters.</CardDescription>
+        </Card>
+      ) : null}
     </div>
   );
 }

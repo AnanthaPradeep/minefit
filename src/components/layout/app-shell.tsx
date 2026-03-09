@@ -31,8 +31,8 @@ const footerLinks = [
   { to: "/support", label: "Support" },
 ];
 
-const HEADER_LOGO = `${import.meta.env.BASE_URL}assets/images/logo.png`;
-const SIDEBAR_LOGO = `${import.meta.env.BASE_URL}assets/images/logo1.png`;
+const BRAND_LOGO = `${import.meta.env.BASE_URL}assets/images/logo.png`;
+const BRAND_WORDMARK = `${import.meta.env.BASE_URL}assets/images/logo1.png`;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
@@ -69,12 +69,18 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="hidden border-r border-zinc-200 bg-white px-4 py-5 dark:border-zinc-800 dark:bg-zinc-900 lg:sticky lg:top-0 lg:block lg:h-screen lg:overflow-y-auto">
         <Link
           to="/dashboard"
-          className="mb-7 flex items-center justify-center gap-3 rounded-2xl px-3 py-2.5 text-white transition-transform duration-200 hover:scale-[1.01]"
+          className="mb-2 flex flex-col items-center justify-center rounded-2xl px-3 py-1.5 text-white transition-transform duration-200 hover:scale-[1.01]"
         >
           <img
-            src={SIDEBAR_LOGO}
-            alt="MineFit brand"
-            className="h-auto w-auto object-contain"
+            src={BRAND_LOGO}
+            alt="MineFit logo"
+            className="mb-5 h-35 w-auto rounded-xl object-contain"
+            loading="eager"
+          />
+          <img
+            src={BRAND_WORDMARK}
+            alt="MineFit wordmark"
+            className="-mt-25 h-50 w-auto object-contain"
             loading="eager"
           />
         </Link>
@@ -111,7 +117,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <div className="flex min-h-screen w-full flex-col">
-        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200/90 bg-white/95 px-4 py-3 backdrop-blur dark:border-zinc-800/90 dark:bg-zinc-900/95 lg:hidden">
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-zinc-200/90 bg-white/95 px-4 py-2 backdrop-blur dark:border-zinc-800/90 dark:bg-zinc-900/95 lg:hidden">
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -120,15 +126,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <div className="flex items-center gap-2">
-            <img
-              src={HEADER_LOGO}
-              alt="MineFit logo"
-              className="h-12 w-15 rounded-md object-contain"
-              loading="eager"
-            />
-            <p className="text-sm font-semibold tracking-tight">{activeItem?.label ?? "MineFit"}</p>
-          </div>
+          <p className="text-sm font-semibold tracking-tight">{activeItem?.label ?? "MineFit"}</p>
           <Link
             to="/settings"
             className="rounded-xl border border-zinc-200 p-2 text-zinc-700 transition-colors duration-200 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
@@ -138,16 +136,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
         </header>
 
-        <header className="hidden items-center justify-between border-b border-zinc-200/90 bg-white/95 px-6 py-4 backdrop-blur dark:border-zinc-800/90 dark:bg-zinc-900/95 lg:flex">
-          <div className="flex items-center gap-3">
-            <img
-              src={HEADER_LOGO}
-              alt="MineFit logo"
-              className="h-12 w-15 rounded-md object-contain"
-              loading="eager"
-            />
-            <h1 className="text-xl font-semibold tracking-tight">{activeItem?.label ?? "MineFit"}</h1>
-          </div>
+        <header className="hidden items-center justify-between border-b border-zinc-200/90 bg-white/95 px-6 py-2 backdrop-blur dark:border-zinc-800/90 dark:bg-zinc-900/95 lg:flex">
+          <h1 className="text-xl font-semibold tracking-tight">{activeItem?.label ?? "MineFit"}</h1>
           <Link
             to="/settings"
             className="rounded-xl bg-zinc-100 px-3.5 py-2 text-sm font-medium text-zinc-700 transition-colors duration-200 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
@@ -188,22 +178,28 @@ export function AppShell({ children }: { children: ReactNode }) {
             aria-label="Close navigation"
           />
           <aside className="relative h-full w-72 border-r border-zinc-200 bg-white px-4 py-5 shadow-xl transition-transform duration-300 dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex items-start justify-between">
               <Link
                 to="/dashboard"
-                className="flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold tracking-tight text-white transition-transform duration-200 hover:scale-[1.01]"
+                className="flex flex-col items-center justify-center rounded-xl px-3 py-1 text-sm font-semibold tracking-tight text-white transition-transform duration-200 hover:scale-[1.01]"
               >
                 <img
-                  src={SIDEBAR_LOGO}
-                  alt="MineFit brand"
-                  className="h-auto w-auto object-contain"
+                  src={BRAND_LOGO}
+                  alt="MineFit logo"
+                  className="mb-5 h-35 w-auto rounded-xl object-contain"
+                  loading="eager"
+                />
+                <img
+                  src={BRAND_WORDMARK}
+                  alt="MineFit wordmark"
+                  className="-mt-25 h-50 w-auto object-contain"
                   loading="eager"
                 />
               </Link>
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
-                className="rounded-xl border border-zinc-200 p-2 text-zinc-700 transition-colors duration-200 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                className="mt-1 self-start rounded-xl border border-zinc-200 p-2 text-zinc-700 transition-colors duration-200 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
                 aria-label="Close drawer"
               >
                 <X className="h-5 w-5" />
