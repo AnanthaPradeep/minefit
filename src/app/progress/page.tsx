@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { calculateBmi, convertKgToUnits, convertUnitsToKg, getBmiInsight } from "@/lib/bmi";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   ActivityMinutesChart,
   AdherenceChart,
+  BmiChart,
   WeightChart,
   WeeklyWorkoutChart,
 } from "@/components/feature/progress-charts";
@@ -16,7 +18,10 @@ import { getWeeklyActiveMinutes } from "@/state/store";
 import { useAppStore } from "@/state/store";
 
 export default function ProgressPage() {
-  const [weight, setWeight] = useState(68);
+  const user = useAppStore((state) => state.currentUser);
+  const units = useAppStore((state) => state.settings?.units ?? "metric");
+  const bmiProfile = useAppStore((state) => state.settings?.bmiThresholdProfile ?? "standard");
+  const [weightInput, setWeightInput] = useState("68");
   const [range, setRange] = useState<7 | 30 | 90>(30);
   const [waist, setWaist] = useState(0);
   const [chest, setChest] = useState(0);
@@ -43,6 +48,10 @@ export default function ProgressPage() {
   const first = progress[progress.length - 1]?.weight;
   const latest = progress[0]?.weight;
   const delta = first !== undefined && latest !== undefined ? latest - first : 0;
+  const displayDelta = convertKgToUnits(delta, units);
+  const latestWeightKg = latest ?? user?.weight ?? 0;
+  const currentBmi = user ? calculateBmi(user.height, latestWeightKg) : null;
+  const bmiInsight = getBmiInsight({ age: user?.age ?? 25, bmi: currentBmi, profile: bmiProfile });
   const currentGoal = goals[0];
 
   const currentAdherence = adherenceSnapshots[0];
@@ -59,6 +68,8 @@ export default function ProgressPage() {
     [latestMeasurement],
   );
 
+  const weightLabel = units === "imperial" ? "Weight (lb)" : "Weight (kg)";
+
   return (
     <div className="space-y-4">
       <Card>
@@ -72,12 +83,33 @@ export default function ProgressPage() {
           <div className="mt-3 flex gap-2">
             <Input
               type="number"
-              value={weight}
-              onChange={(event) => setWeight(Number(event.target.value))}
+              value={weightInput}
+              placeholder={weightLabel}
+              onChange={(event) => setWeightInput(event.target.value)}
             />
-            <Button onClick={() => addProgressEntry(weight, todayISO())}>Save</Button>
+            <Button
+              onClick={() => {
+                const parsed = Number(weightInput);
+                if (!Number.isFinite(parsed) || parsed <= 0) return;
+                const weightKg = convertUnitsToKg(parsed, units);
+                addProgressEntry(weightKg, todayISO());
+              }}
+            >
+              Save
+            </Button>
           </div>
-          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Current change: {delta >= 0 ? "+" : ""}{delta.toFixed(1)} kg</p>
+          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+            Current change: {displayDelta >= 0 ? "+" : ""}
+            {displayDelta.toFixed(1)} {units === "imperial" ? "lb" : "kg"}
+          </p>
+        </Card>
+
+        <Card>
+          <CardTitle>Current BMI</CardTitle>
+          <p className="mt-2 text-3xl font-bold">{currentBmi ?? "--"}</p>
+          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{bmiInsight.label}</p>
+          <p className="text-xs text-zinc-600 dark:text-zinc-300">Risk: {bmiInsight.risk}</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">{bmiInsight.detail}</p>
         </Card>
 
         <Card>
@@ -156,6 +188,13 @@ export default function ProgressPage() {
           ))}
         </div>
         <WeightChart data={progress} range={range} />
+      </Card>
+
+      <Card>
+        <CardTitle>BMI Trend</CardTitle>
+        <CardDescription className="mt-1">Calculated from your saved weight entries and profile height</CardDescription>
+        <BmiChart data={progress} heightCm={user?.height ?? 165} range={range} />
+        <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">BMI is a screening metric, not a diagnosis.</p>
       </Card>
 
       <Card>

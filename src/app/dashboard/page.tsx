@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Flame, Timer, Utensils } from "lucide-react";
+import { calculateBmi, getBmiInsight } from "@/lib/bmi";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MediaCard } from "@/components/feature/media-card";
@@ -17,6 +18,8 @@ export default function DashboardPage() {
   const getTodayDietSummary = useAppStore((state) => state.getTodayDietSummary);
   const adherence = useAppStore((state) => state.adherenceSnapshots[0]);
   const latestMilestone = useAppStore((state) => state.milestones[0]);
+  const user = useAppStore((state) => state.currentUser);
+  const bmiProfile = useAppStore((state) => state.settings?.bmiThresholdProfile ?? "standard");
 
   const meals = useMemo(() => {
     const today = todayISO();
@@ -30,6 +33,9 @@ export default function DashboardPage() {
   const weeklyCount = getWeeklyWorkoutCount(logs);
   const weeklyMinutes = getWeeklyActiveMinutes(logs);
   const calories = meals.reduce((sum, meal) => sum + meal.calories, 0);
+  const recentWeight = useAppStore((state) => state.progressEntries[0]?.weight);
+  const bmi = user ? calculateBmi(user.height, recentWeight ?? user.weight) : null;
+  const bmiInsight = getBmiInsight({ age: user?.age ?? 25, bmi, profile: bmiProfile });
 
   return (
     <div className="space-y-4">
@@ -95,7 +101,7 @@ export default function DashboardPage() {
 
       <Card>
         <CardTitle>Progress Summary</CardTitle>
-        <div className="mt-3 grid grid-cols-2 gap-2 text-sm md:grid-cols-4">
+        <div className="mt-3 grid grid-cols-2 gap-2 text-sm md:grid-cols-5">
           <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
             <p className="text-zinc-500 dark:text-zinc-400">Streak</p>
             <p className="text-lg font-bold">{streak}</p>
@@ -119,6 +125,12 @@ export default function DashboardPage() {
           <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
             <p className="text-zinc-500 dark:text-zinc-400">Water</p>
             <p className="text-lg font-bold">{dietSummary.hydrationMl} ml</p>
+          </div>
+          <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
+            <p className="text-zinc-500 dark:text-zinc-400">BMI</p>
+            <p className="text-lg font-bold">{bmi ?? "--"}</p>
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{bmiInsight.label}</p>
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Risk: {bmiInsight.risk}</p>
           </div>
         </div>
       </Card>

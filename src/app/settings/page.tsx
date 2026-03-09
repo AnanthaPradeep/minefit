@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { calculateBmi, convertCmToUnits, convertKgToUnits, getBmiInsight } from "@/lib/bmi";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import type { AppExportPayload } from "@/lib/types";
@@ -11,7 +12,9 @@ export default function SettingsPage() {
   const [searchParams] = useSearchParams();
   const user = useAppStore((state) => state.currentUser);
   const darkMode = useAppStore((state) => state.ui.darkMode);
+  const settings = useAppStore((state) => state.settings);
   const setDarkMode = useAppStore((state) => state.setDarkMode);
+  const setBmiThresholdProfile = useAppStore((state) => state.setBmiThresholdProfile);
   const exportData = useAppStore((state) => state.exportData);
   const importData = useAppStore((state) => state.importData);
   const clearAllData = useAppStore((state) => state.clearAllData);
@@ -24,6 +27,12 @@ export default function SettingsPage() {
   }, []);
 
   const profileUpdated = searchParams.get("updated") === "profile";
+  const units = settings?.units ?? "metric";
+  const bmiProfile = settings?.bmiThresholdProfile ?? "standard";
+  const bmi = user ? calculateBmi(user.height, user.weight) : null;
+  const bmiInsight = getBmiInsight({ age: user?.age ?? 25, bmi, profile: bmiProfile });
+  const userHeight = user ? convertCmToUnits(user.height, units) : null;
+  const userWeight = user ? convertKgToUnits(user.weight, units) : null;
 
   return (
     <div className="space-y-4">
@@ -36,13 +45,36 @@ export default function SettingsPage() {
         <CardTitle>Profile</CardTitle>
         {profileUpdated ? <CardDescription className="mt-1 text-emerald-700 dark:text-emerald-300">Profile updated successfully.</CardDescription> : null}
         <CardDescription className="mt-2">
-          {user ? `${user.name} • ${user.age} yrs • ${user.height} cm • ${user.weight} kg` : "No profile setup yet"}
+          {user
+            ? `${user.name} • ${user.age} yrs • ${userHeight} ${units === "imperial" ? "in" : "cm"} • ${userWeight} ${units === "imperial" ? "lb" : "kg"}`
+            : "No profile setup yet"}
         </CardDescription>
+        {user ? <CardDescription className="mt-1">BMI: {bmi ?? "--"} • {bmiInsight.label} • Risk: {bmiInsight.risk}</CardDescription> : null}
         <Link to="/settings/profile" className="mt-3 block">
           <Button className="w-full" variant="outline">
             Edit Profile
           </Button>
         </Link>
+      </Card>
+
+      <Card>
+        <CardTitle>BMI Settings</CardTitle>
+        <CardDescription className="mt-1">BMI is a screening metric, not a medical diagnosis.</CardDescription>
+        <div className="mt-3 space-y-2">
+          <select
+            className="h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            value={bmiProfile}
+            onChange={(event) => {
+              void setBmiThresholdProfile(event.target.value as "standard" | "asian");
+            }}
+          >
+            <option value="standard">Global standard thresholds</option>
+            <option value="asian">Asian-adjusted thresholds</option>
+          </select>
+          {user && user.age < 20 ? (
+            <p className="text-xs text-amber-700 dark:text-amber-300">Teen mode: use BMI-for-age percentile charts for interpretation.</p>
+          ) : null}
+        </div>
       </Card>
 
       <Card id="privacy-controls">

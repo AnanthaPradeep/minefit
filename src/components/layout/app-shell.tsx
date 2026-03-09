@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Activity, Bell, Dumbbell, House, Menu, Salad, Settings, Waves, X } from "lucide-react";
+import { calculateBmi, getBmiInsight } from "@/lib/bmi";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/state/store";
 
 const hideNavExact = ["/", "/onboarding"];
 const hideNavPrefix = ["/setup"];
@@ -35,6 +37,9 @@ const SIDEBAR_LOGO = `${import.meta.env.BASE_URL}assets/images/logo1.png`;
 export function AppShell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const user = useAppStore((state) => state.currentUser);
+  const bmiProfile = useAppStore((state) => state.settings?.bmiThresholdProfile ?? "standard");
+  const recentWeight = useAppStore((state) => state.progressEntries[0]?.weight);
   const showNav =
     !hideNavExact.includes(pathname) &&
     !hideNavPrefix.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
@@ -44,6 +49,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     () => navItems.find((item) => pathname === item.to || pathname.startsWith(`${item.to}/`)),
     [pathname],
   );
+  const bmi = user ? calculateBmi(user.height, recentWeight ?? user.weight) : null;
+  const bmiInsight = getBmiInsight({ age: user?.age ?? 25, bmi, profile: bmiProfile });
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -71,6 +78,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             loading="eager"
           />
         </Link>
+
+        {user ? (
+          <div className="mb-4 rounded-xl bg-zinc-100 px-3 py-2 text-xs dark:bg-zinc-800">
+            <p className="font-semibold text-zinc-700 dark:text-zinc-200">BMI {bmi ?? "--"}</p>
+            <p className="text-zinc-500 dark:text-zinc-400">{bmiInsight.label} • Risk: {bmiInsight.risk}</p>
+          </div>
+        ) : null}
 
         <nav className="space-y-1.5">
           {navItems.map((item) => {
@@ -195,6 +209,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <X className="h-5 w-5" />
               </button>
             </div>
+
+            {user ? (
+              <div className="mb-4 rounded-xl bg-zinc-100 px-3 py-2 text-xs dark:bg-zinc-800">
+                <p className="font-semibold text-zinc-700 dark:text-zinc-200">BMI {bmi ?? "--"}</p>
+                <p className="text-zinc-500 dark:text-zinc-400">{bmiInsight.label} • Risk: {bmiInsight.risk}</p>
+              </div>
+            ) : null}
 
             <nav className="space-y-1.5">
               {navItems.map((item) => {

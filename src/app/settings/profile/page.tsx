@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { calculateBmi, getBmiInsight } from "@/lib/bmi";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -59,6 +60,7 @@ export default function ProfileSettingsPage() {
   const navigate = useNavigate();
   const user = useAppStore((state) => state.currentUser);
   const settingsUnits = useAppStore((state) => state.settings?.units ?? "metric");
+  const bmiProfile = useAppStore((state) => state.settings?.bmiThresholdProfile ?? "standard");
   const createOrUpdateProfile = useAppStore((state) => state.createOrUpdateProfile);
   const setUnits = useAppStore((state) => state.setUnits);
 
@@ -102,6 +104,8 @@ export default function ProfileSettingsPage() {
 
   const heightLabel = form.units === "imperial" ? "Height (in)" : "Height (cm)";
   const weightLabel = form.units === "imperial" ? "Weight (lb)" : "Weight (kg)";
+  const previewBmi = calculateBmi(toMetricHeight(Number(form.height), form.units), toMetricWeight(Number(form.weight), form.units));
+  const previewBmiInsight = getBmiInsight({ age: Number(form.age), bmi: previewBmi, profile: bmiProfile });
 
   const validate = (candidate: ProfileForm) => {
     const nextErrors: Partial<Record<keyof ProfileForm, string>> = {};
@@ -152,6 +156,12 @@ export default function ProfileSettingsPage() {
       </Card>
 
       <Card>
+        <div className="mb-3 rounded-xl bg-zinc-100 p-3 text-sm dark:bg-zinc-800">
+          <p className="font-semibold">BMI Preview: {previewBmi ?? "--"} • {previewBmiInsight.label}</p>
+          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">Risk: {previewBmiInsight.risk}</p>
+          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">{previewBmiInsight.detail}</p>
+        </div>
+
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-zinc-200 text-lg font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
             {form.avatarUrl.trim() ? (

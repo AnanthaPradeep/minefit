@@ -28,6 +28,7 @@ export type YogaBestTime = "morning" | "evening" | "after-meal";
 export type ReminderType = "workout" | "yoga" | "meal" | "water";
 export type ReminderScheduleType = "daily" | "weekly" | "monthly" | "custom";
 export type ReminderPriority = "low" | "medium" | "high";
+export type BmiThresholdProfile = "standard" | "asian";
 
 export interface UserProfile {
   id: string;
@@ -253,7 +254,7 @@ export interface ReminderLog {
   id: string;
   userId: string;
   reminderId: string;
-  action: "done" | "snoozed" | "skipped";
+  action: "done" | "snoozed" | "skipped" | "triggered";
   at: string;
 }
 
@@ -263,6 +264,7 @@ export interface AppSettings {
   darkMode: boolean;
   soundEnabled: boolean;
   units: "metric" | "imperial";
+  bmiThresholdProfile?: BmiThresholdProfile;
 }
 
 export interface OnboardingState {

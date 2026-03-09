@@ -4,12 +4,14 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { db } from "@/lib/db";
 import { suggestMeals } from "@/lib/meal-suggestion";
+import { isReminderDueNow } from "@/lib/notifications";
 import { foodCatalogByRegion, seedLibraryIfNeeded } from "@/lib/seed";
 import { downloadJson, todayISO, uid, weekStartISO } from "@/lib/utils";
 import type {
   AdherenceSnapshot,
   AppExportPayload,
   AppSettings,
+  BmiThresholdProfile,
   DietRegion,
   Exercise,
   FitnessGoal,
@@ -196,12 +198,14 @@ interface AppState {
   ) => Promise<void>;
   toggleReminder: (id: string) => Promise<void>;
   snoozeReminder: (id: string, minutes: number) => Promise<void>;
+  markReminderTriggered: (id: string, triggeredAt?: string) => Promise<void>;
   markReminderDone: (id: string) => Promise<void>;
   getTodayMeals: () => MealEntry[];
   getGoalSuggestions: () => ReturnType<typeof suggestMeals> | null;
   getTodayReminderSummary: () => {
     enabledCount: number;
     dueTodayCount: number;
+    dueNowCount: number;
     completedTodayCount: number;
     snoozedCount: number;
     completionRate: number;
@@ -223,6 +227,7 @@ interface AppState {
   clearAllData: () => Promise<void>;
   setDarkMode: (enabled: boolean) => Promise<void>;
   setUnits: (units: AppSettings["units"]) => Promise<void>;
+  setBmiThresholdProfile: (profile: BmiThresholdProfile) => Promise<void>;
   completeOnboarding: (payload?: { skipped?: boolean; starterGoal?: FitnessGoal }) => void;
 }
 
@@ -232,6 +237,7 @@ const baseSettings = (userId: string): AppSettings => ({
   darkMode: false,
   soundEnabled: true,
   units: "metric",
+  bmiThresholdProfile: "standard",
 });
 
 function buildDefaultNutritionGoal(user: UserProfile): Omit<NutritionGoal, "id" | "userId" | "createdAt" | "updatedAt"> {
@@ -368,7 +374,7 @@ export const useAppStore = create<AppState>()(
           dietRegion: recentRegion,
           reminders,
           reminderLogs,
-          settings: settings ?? null,
+          settings: settings ? { ...settings, bmiThresholdProfile: settings.bmiThresholdProfile ?? "standard" } : null,
           ui: { darkMode: settings?.darkMode ?? false },
         });
       },
@@ -736,6 +742,39 @@ export const useAppStore = create<AppState>()(
         }));
       },
 
+      markReminderTriggered: async (id, triggeredAt) => {
+        const reminder = get().reminders.find((item) => item.id === id);
+        const user = get().currentUser;
+        if (!reminder || !user) return;
+
+        const at = triggeredAt ?? new Date().toISOString();
+        const updated: Reminder = {
+          ...reminder,
+          snoozeUntil:
+            reminder.snoozeUntil && new Date(reminder.snoozeUntil).getTime() <= new Date(at).getTime()
+              ? undefined
+              : reminder.snoozeUntil,
+          lastTriggeredAt: at,
+          updatedAt: at,
+        };
+
+        const log: ReminderLog = {
+          id: uid("reminder-log"),
+          userId: user.id,
+          reminderId: reminder.id,
+          action: "triggered",
+          at,
+        };
+
+        await db.reminders.put(updated);
+        await db.reminderLogs.add(log);
+
+        set((state) => ({
+          reminders: state.reminders.map((item) => (item.id === id ? updated : item)),
+          reminderLogs: [log, ...state.reminderLogs],
+        }));
+      },
+
       markReminderDone: async (id) => {
         const reminder = get().reminders.find((item) => item.id === id);
         const user = get().currentUser;
@@ -787,6 +826,7 @@ export const useAppStore = create<AppState>()(
         const reminders = get().reminders;
         const enabledReminders = reminders.filter((item) => item.enabled);
         const dueToday = enabledReminders.filter((item) => isReminderScheduledForDate(item, now));
+        const dueNow = enabledReminders.filter((item) => isReminderDueNow(item, now));
         const completedToday = get().reminderLogs.filter(
           (log) => log.action === "done" && log.at.startsWith(today),
         );
@@ -799,6 +839,7 @@ export const useAppStore = create<AppState>()(
         return {
           enabledCount: enabledReminders.length,
           dueTodayCount: dueToday.length,
+          dueNowCount: dueNow.length,
           completedTodayCount: completedToday.length,
           snoozedCount,
           completionRate,
@@ -1032,6 +1073,29 @@ export const useAppStore = create<AppState>()(
         }
 
         const updated = { ...settings!, units };
+        await db.settings.put(updated);
+        set({ settings: updated, ui: { darkMode: updated.darkMode } });
+      },
+
+      setBmiThresholdProfile: async (profile) => {
+        const settings = get().settings;
+        const currentUser = get().currentUser;
+
+        if (!settings && !currentUser) {
+          return;
+        }
+
+        if (!settings && currentUser) {
+          const created = {
+            ...baseSettings(currentUser.id),
+            bmiThresholdProfile: profile,
+          };
+          await db.settings.put(created);
+          set({ settings: created, ui: { darkMode: created.darkMode } });
+          return;
+        }
+
+        const updated = { ...settings!, bmiThresholdProfile: profile };
         await db.settings.put(updated);
         set({ settings: updated, ui: { darkMode: updated.darkMode } });
       },

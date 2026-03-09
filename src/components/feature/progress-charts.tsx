@@ -13,6 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { calculateBmi } from "@/lib/bmi";
 import type { AdherenceSnapshot, ProgressEntry, WorkoutLog } from "@/lib/types";
 
 export function WeightChart({ data, range = 30 }: { data: ProgressEntry[]; range?: 7 | 30 | 90 }) {
@@ -169,6 +170,49 @@ export function ActivityMinutesChart({ logs, targetMinutes }: { logs: WorkoutLog
           <Bar dataKey="minutes" fill="#10b981" radius={6} />
           <Bar dataKey="target" fill="#64748b" radius={6} />
         </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+export function BmiChart({
+  data,
+  heightCm,
+  range = 30,
+}: {
+  data: ProgressEntry[];
+  heightCm: number;
+  range?: 7 | 30 | 90;
+}) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const chartData = [...data]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-range)
+    .map((item) => ({
+      date: item.date.slice(5),
+      bmi: calculateBmi(heightCm, item.weight) ?? 0,
+    }));
+
+  if (!mounted) {
+    return <div className="h-56 w-full rounded-xl bg-zinc-100 dark:bg-zinc-800" />;
+  }
+
+  return (
+    <div className="h-56 w-full min-w-0">
+      <ResponsiveContainer>
+        <LineChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="bmi" stroke="#f59e0b" strokeWidth={2} />
+        </LineChart>
       </ResponsiveContainer>
     </div>
   );

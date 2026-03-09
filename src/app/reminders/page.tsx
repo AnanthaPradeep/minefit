@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ensureNotificationPermission, scheduleInAppNotification } from "@/lib/notifications";
+import { ensureNotificationPermission, isReminderDueNow } from "@/lib/notifications";
 import type { ReminderPriority, ReminderScheduleType, ReminderType } from "@/lib/types";
 import { useAppStore } from "@/state/store";
 
@@ -48,7 +48,7 @@ export default function ReminderPage() {
       <Card>
         <CardTitle>Reminder Manager 2.0</CardTitle>
         <CardDescription className="mt-1">Actionable reminders with schedule control, snooze, and adherence</CardDescription>
-        <div className="mt-3 grid grid-cols-2 gap-2 text-sm md:grid-cols-5">
+        <div className="mt-3 grid grid-cols-2 gap-2 text-sm md:grid-cols-6">
           <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
             <p className="text-zinc-500 dark:text-zinc-400">Enabled</p>
             <p className="text-lg font-semibold">{summary.enabledCount}</p>
@@ -56,6 +56,10 @@ export default function ReminderPage() {
           <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
             <p className="text-zinc-500 dark:text-zinc-400">Due Today</p>
             <p className="text-lg font-semibold">{summary.dueTodayCount}</p>
+          </div>
+          <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
+            <p className="text-zinc-500 dark:text-zinc-400">Due Now</p>
+            <p className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">{summary.dueNowCount}</p>
           </div>
           <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
             <p className="text-zinc-500 dark:text-zinc-400">Completed</p>
@@ -169,10 +173,7 @@ export default function ReminderPage() {
                 note,
                 priority,
               });
-              const permission = await ensureNotificationPermission();
-              if (permission === "granted") {
-                scheduleInAppNotification(title, 3000);
-              }
+              await ensureNotificationPermission();
               setTitle("");
               setNote("");
             }}
@@ -205,6 +206,9 @@ export default function ReminderPage() {
                     <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
                       Snoozed until {new Date(reminder.snoozeUntil).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </p>
+                  ) : null}
+                  {isReminderDueNow(reminder) ? (
+                    <p className="mt-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">Due now</p>
                   ) : null}
                 </div>
 
