@@ -17,6 +17,20 @@ export function PlayerClient({ id }: { id?: string }) {
   const [resting, setResting] = useState(false);
 
   const exercise = useMemo(() => exercises.find((item) => item.id === id), [exercises, id]);
+  const youtubeEmbedUrl = useMemo(() => {
+    if (!exercise) return undefined;
+    if (exercise.youtubeId) return `https://www.youtube.com/embed/${exercise.youtubeId}`;
+    return exercise.youtubeUrl;
+  }, [exercise]);
+  const youtubeWatchUrl = useMemo(() => {
+    if (!exercise) return undefined;
+    if (exercise.youtubeId) return `https://www.youtube.com/watch?v=${exercise.youtubeId}`;
+    if (!exercise.youtubeUrl) return undefined;
+    if (exercise.youtubeUrl.includes("/embed/")) {
+      return exercise.youtubeUrl.replace("/embed/", "/watch?v=");
+    }
+    return exercise.youtubeUrl;
+  }, [exercise]);
 
   useEffect(() => {
     if (!exercise) return;
@@ -103,12 +117,32 @@ export function PlayerClient({ id }: { id?: string }) {
       <Card>
         <CardTitle>YouTube Demo</CardTitle>
         <div className="mt-3 aspect-video overflow-hidden rounded-xl">
-          {exercise.youtubeUrl ? (
-            <iframe className="h-full w-full" src={exercise.youtubeUrl} title={exercise.name} allowFullScreen />
+          {youtubeEmbedUrl ? (
+            <iframe
+              className="h-full w-full"
+              src={youtubeEmbedUrl}
+              title={exercise.name}
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-zinc-500 dark:text-zinc-400">No video available offline</div>
           )}
         </div>
+        {youtubeWatchUrl ? (
+          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+            <a
+              href={youtubeWatchUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="font-medium text-emerald-600 hover:underline"
+            >
+              Open on YouTube
+            </a>
+          </p>
+        ) : null}
       </Card>
 
       <Card>

@@ -8,6 +8,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MediaCard } from "@/components/feature/media-card";
 import { ExerciseTimer } from "@/components/feature/exercise-timer";
+import { DashboardMusicPlayerCard } from "@/components/feature/dashboard-music-player-card";
 import { useAppStore, getWeeklyActiveMinutes, getWeeklyWorkoutCount, getWorkoutStreak } from "@/state/store";
 import { todayISO } from "@/lib/utils";
 
@@ -72,6 +73,8 @@ export default function DashboardPage() {
           </Link>
         </div>
       </Card>
+
+      <DashboardMusicPlayerCard />
 
       <Card>
         <CardTitle>Quick Actions</CardTitle>

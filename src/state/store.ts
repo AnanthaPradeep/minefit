@@ -72,6 +72,22 @@ function normalizeReminder(reminder: Reminder): Reminder {
 }
 
 function normalizeExercise(exercise: Exercise & { targetMuscle?: string }) {
+  const parseYoutubeId = (url?: string) => {
+    if (!url) return undefined;
+    const patterns = [
+      /youtube\.com\/embed\/([A-Za-z0-9_-]{6,})/i,
+      /youtube\.com\/watch\?v=([A-Za-z0-9_-]{6,})/i,
+      /youtu\.be\/([A-Za-z0-9_-]{6,})/i,
+    ];
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match?.[1]) return match[1];
+    }
+    return undefined;
+  };
+
+  const youtubeId = exercise.youtubeId ?? parseYoutubeId(exercise.youtubeUrl);
+
   const targetMuscles =
     Array.isArray(exercise.targetMuscles) && exercise.targetMuscles.length > 0
       ? exercise.targetMuscles
@@ -93,6 +109,8 @@ function normalizeExercise(exercise: Exercise & { targetMuscle?: string }) {
     restTime: exercise.restTime ?? 45,
     recommendedSets: exercise.recommendedSets ?? 3,
     recommendedReps: exercise.recommendedReps ?? 12,
+    youtubeId,
+    youtubeUrl: youtubeId ? `https://www.youtube.com/embed/${youtubeId}` : exercise.youtubeUrl,
     mistakesToAvoid:
       Array.isArray(exercise.mistakesToAvoid) && exercise.mistakesToAvoid.length > 0
         ? exercise.mistakesToAvoid

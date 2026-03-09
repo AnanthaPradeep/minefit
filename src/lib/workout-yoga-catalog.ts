@@ -47,6 +47,118 @@ interface YogaJsonShape {
 const workoutsData = workoutsJson as WorkoutJsonShape;
 const yogaData = yogaJson as YogaJsonShape;
 
+const YOUTUBE_EMBED_BASE = "https://www.youtube.com/embed/";
+const YOUTUBE_WATCH_BASE = "https://www.youtube.com/watch?v=";
+
+const workoutYoutubeIdByName: Record<string, string> = {
+  Cycling: "1VYlOKUdylM",
+  "Jump Rope": "FJmRQ5iTXKE",
+  Rowing: "H0r_ZPXJLtg",
+  Running: "_kGESn8ArrU",
+  "Stair Climbing": "FfJZ2mZ9B8E",
+  "Bent Over Row": "vT2GjY_Umpw",
+  "Bicep Curl": "ykJmrZ5v0Oo",
+  "Concentration Curl": "Jvj2wV0vOYU",
+  "Dumbbell Bench Press": "VmB1G1K7v94",
+  "Dumbbell Deadlift": "0oHq1L0Z8xY",
+  "Dumbbell Fly": "eozdVDA78K0",
+  "Dumbbell Lunges": "QOVaHwm-Q6U",
+  "Dumbbell Step Up": "dQqApCGd5Ss",
+  "Front Raise": "-t7fuZ0KhDA",
+  "Goblet Squat": "MeIiIdhvXT4",
+  "Hammer Curl": "zC3nLlEvin4",
+  "Lateral Raise": "3VcKaXpzqRo",
+  "Overhead Tricep Extension": "_gsUck-7M74",
+  "Renegade Row": "roCP6wCXPqo",
+  "Reverse Fly": "pYcpY20QaE8",
+  "Shoulder Press": "B-aVuyhvLHU",
+  "Tricep Kickback": "6SS6K3lAwZ8",
+  "Bear Crawl": "2N6n3Kbu9Vw",
+  "Bicycle Crunch": "9FGilxCbdz8",
+  "Bulgarian Split Squats": "2C-uNgKwPLE",
+  Burpees: "TU8QYVW0gDU",
+  "Decline Push Ups": "SKPab2YC8F8",
+  "Diamond Push Ups": "J0DnG1_S92I",
+  "High Knees": "OAJ_J3EZkdY",
+  "Jump Squats": "U4s4mEQ5VqU",
+  "Jumping Jacks": "c4DAnQ6DtF8",
+  "Leg Raises": "JB2oyawG9KI",
+  Lunges: "QOVaHwm-Q6U",
+  "Mountain Climbers": "nmwgirgXLYM",
+  "Pike Push Ups": "qHQ_E-f5278",
+  Plank: "pSHjTRCQxIw",
+  "Push Ups": "IODxDxX7oi4",
+  "Russian Twists": "wkD8rjkodUI",
+  "Side Plank": "K2VljzCC16g",
+  Squats: "aclHkVaku9U",
+  "Wall Sit": "y-wV4Venusw",
+  "Wide Push Ups": "rrz5Cjv2fAY",
+  "Barbell Row": "vT2GjY_Umpw",
+  "Bench Press": "rT7DgCr-3pg",
+  Deadlift: "op9kVnSso6Q",
+  "Overhead Press": "qEwKCR5JCog",
+  "Cable Row": "GZbfZ033f74",
+  "Lat Pulldown": "CAwf7n6Luuc",
+  "Leg Curl": "1Tq3QdYUuHs",
+  "Leg Press": "IZxyjW7MPJQ",
+  "Pec Deck": "eGjt4lk6g34",
+  "Kettlebell Clean": "KQfT4y4B1sA",
+  "Kettlebell Snatch": "yeMXdkZ18EA",
+  "Kettlebell Swing": "YSxHifyI6s8",
+  "Turkish Get Up": "sgd8n917Zv0",
+  "Cat Cow Stretch": "kqnua4rHVVA",
+  "Gentle Yoga": "v7AYKMP6rOE",
+  "Light Stretching": "JEvPq5t0n7g",
+  "Seated Twists": "GZbfZ033f74",
+  Walking: "0W5QHh7v7xE",
+  "Arm Circles": "140RTNMciH8",
+  "Bodyweight Squats": "aclHkVaku9U",
+  "Butt Kicks": "ZNDHivUg7vA",
+  "Neck Rotation": "8h4kF9s5N8Y",
+  "Shadow Boxing": "ioe4x7s4pW4",
+  "Shoulder Rolls": "6b9Qz2bA0cA",
+  "Side Stretch": "1eB5XxYJ6wY",
+  "Spot Jogging": "FJmRQ5iTXKE",
+  "Standing Forward Bend": "2MJGg-dUKh0",
+  "Torso Twists": "wkD8rjkodUI",
+};
+
+const yogaYoutubeIdByCategory = {
+  beginner: "v7AYKMP6rOE",
+  intermediate: "4C-gxOE0j7s",
+  advanced: "0o0kNeOyH98",
+  relaxation: "inpok4MKVLM",
+  digestion: "dAqQqmaI9vY",
+} as const;
+
+const yogaYoutubeIdByName: Record<string, string> = {
+  Tadasana: "NYhH8Gr35cI",
+  Vrikshasana: "yVE4XXFFO70",
+  Bhujangasana: "n6jrC6WeF84",
+  Balasana: "eqVMAPM00DM",
+  Sukhasana: "zLvJD7iKVhw",
+  Trikonasana: "upFYlxZHif0",
+  Utkatasana: "ySafTekJ3Ls",
+  "Warrior I": "5rT--p_cLOc",
+  "Warrior II": "4Ejz7IgODlU",
+  "Bridge Pose": "NnbvPeAIhmA",
+  "Crow Pose": "DgvjvwPGLPY",
+  Headstand: "V1HbXt5ZRlg",
+  "Legs Up The Wall": "_OQEIiZLY-0",
+  "Supine Twist": "ezyMaQEaVaI",
+  "Happy Baby Pose": "7s0EKic5Z8Y",
+  "Cat Cow Pose": "y39PrKY_4JM",
+  "Wind Relieving Pose": "1udKnNcPSzk",
+};
+
+function getYoutubeEmbedUrl(youtubeId?: string) {
+  return youtubeId ? `${YOUTUBE_EMBED_BASE}${youtubeId}` : undefined;
+}
+
+export function getYoutubeWatchUrl(youtubeId?: string) {
+  return youtubeId ? `${YOUTUBE_WATCH_BASE}${youtubeId}` : undefined;
+}
+
 function slugify(input: string) {
   return input
     .toLowerCase()
@@ -96,6 +208,7 @@ function targetForName(name: string): string[] {
 
 function buildExercise(name: string, category: ExerciseCategory, description: string): Exercise {
   const difficulty = difficultyForName(name);
+  const youtubeId = workoutYoutubeIdByName[name];
   return {
     id: makeId("ex", category, name),
     name,
@@ -127,7 +240,8 @@ function buildExercise(name: string, category: ExerciseCategory, description: st
     restTime: difficulty === "advanced" ? 45 : 60,
     recommendedSets: difficulty === "advanced" ? 4 : 3,
     recommendedReps: difficulty === "advanced" ? 15 : 12,
-    youtubeUrl: "https://www.youtube.com/embed/2pLT-olgUJs",
+    youtubeId,
+    youtubeUrl: getYoutubeEmbedUrl(youtubeId),
   };
 }
 
@@ -214,14 +328,6 @@ const yogaBestTime = {
   digestion: "after-meal",
 } as const;
 
-const yogaVideoByCategory = {
-  beginner: "https://www.youtube.com/embed/v7AYKMP6rOE",
-  intermediate: "https://www.youtube.com/embed/4C-gxOE0j7s",
-  advanced: "https://www.youtube.com/embed/0o0kNeOyH98",
-  relaxation: "https://www.youtube.com/embed/inpok4MKVLM",
-  digestion: "https://www.youtube.com/embed/dAqQqmaI9vY",
-} as const;
-
 const yogaByCategory = [
   { key: "beginner", poses: yogaData.beginner },
   { key: "intermediate", poses: yogaData.intermediate },
@@ -231,31 +337,35 @@ const yogaByCategory = [
 ] as const;
 
 export const yogaPoseCatalog: YogaPose[] = yogaByCategory.flatMap((entry) =>
-  entry.poses.map((name) => ({
-    id: makeId("yoga", entry.key, name),
-    name,
-    imageUrl: makeImageUrl(yogaData.image_seed_prefix, entry.key, name),
-    category: entry.key,
-    difficulty:
-      entry.key === "advanced"
-        ? "advanced"
-        : entry.key === "intermediate"
-          ? "intermediate"
-          : "beginner",
-    duration: entry.key === "relaxation" ? 6 : 3,
-    description: yogaDescriptions[entry.key],
-    benefits: ["Mobility", "Breathing control", "Mind-body awareness"],
-    steps: [
-      "Settle into the starting posture",
-      "Move into final pose with control",
-      "Maintain steady breathing",
-      "Release posture safely",
-    ],
-    breathingTechnique: "Inhale through nose, exhale slowly and longer.",
-    precautions: ["Avoid pain range", "Use support props when needed"],
-    bestTime: yogaBestTime[entry.key],
-    youtubeUrl: yogaVideoByCategory[entry.key],
-  })),
+  entry.poses.map((name) => {
+    const youtubeId = yogaYoutubeIdByName[name] ?? yogaYoutubeIdByCategory[entry.key];
+    return {
+      id: makeId("yoga", entry.key, name),
+      name,
+      imageUrl: makeImageUrl(yogaData.image_seed_prefix, entry.key, name),
+      category: entry.key,
+      difficulty:
+        entry.key === "advanced"
+          ? "advanced"
+          : entry.key === "intermediate"
+            ? "intermediate"
+            : "beginner",
+      duration: entry.key === "relaxation" ? 6 : 3,
+      description: yogaDescriptions[entry.key],
+      benefits: ["Mobility", "Breathing control", "Mind-body awareness"],
+      steps: [
+        "Settle into the starting posture",
+        "Move into final pose with control",
+        "Maintain steady breathing",
+        "Release posture safely",
+      ],
+      breathingTechnique: "Inhale through nose, exhale slowly and longer.",
+      precautions: ["Avoid pain range", "Use support props when needed"],
+      bestTime: yogaBestTime[entry.key],
+      youtubeId,
+      youtubeUrl: getYoutubeEmbedUrl(youtubeId),
+    };
+  }),
 );
 
 export const sampleWorkoutPlans: WorkoutPlan[] = [

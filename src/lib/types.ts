@@ -127,6 +127,7 @@ export interface Exercise {
   recommendedReps: number;
   steps: string[];
   mistakesToAvoid: string[];
+  youtubeId?: string;
   youtubeUrl?: string;
 }
 
@@ -143,6 +144,7 @@ export interface YogaPose {
   breathingTechnique: string;
   precautions: string[];
   bestTime: YogaBestTime;
+  youtubeId?: string;
   youtubeUrl?: string;
 }
 

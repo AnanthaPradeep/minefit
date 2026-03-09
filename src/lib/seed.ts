@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import { workoutExerciseCatalog, yogaPoseCatalog } from "@/lib/workout-yoga-catalog";
 import type { DietRegion, Exercise, FoodItem, MealType, WorkoutTiming } from "@/lib/types";
 
+const EXERCISE_LIBRARY_SEED_VERSION = "video-map-v2";
+
 export const southIndianFoods: Record<MealType, FoodItem[]> = {
   morning: [
     { name: "Idli", calories: 120, protein: 4, carbs: 24, fat: 1 },
@@ -113,11 +115,19 @@ export const defaultExercises: Exercise[] = [
     recommendedReps: 1,
     steps: pose.steps,
     mistakesToAvoid: ["Forcing into pain", "Holding breath"],
-    youtubeUrl: "https://www.youtube.com/embed/4pKly2JojMw",
+    youtubeId: pose.youtubeId,
+    youtubeUrl: pose.youtubeUrl,
   })),
 ];
 
 export async function seedLibraryIfNeeded() {
+  const versionMeta = await db.meta.get("exerciseLibrarySeedVersion");
+  const currentCount = await db.exerciseLibrary.count();
+  if (versionMeta?.value === EXERCISE_LIBRARY_SEED_VERSION && currentCount > 0) {
+    return;
+  }
+
   await db.exerciseLibrary.clear();
   await db.exerciseLibrary.bulkAdd(defaultExercises);
+  await db.meta.put({ key: "exerciseLibrarySeedVersion", value: EXERCISE_LIBRARY_SEED_VERSION });
 }
