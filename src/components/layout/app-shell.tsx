@@ -29,8 +29,8 @@ const footerLinks = [
   { to: "/support", label: "Support" },
 ];
 
-const HEADER_LOGO = "/assets/images/logo.png";
-const SIDEBAR_LOGO = "/assets/images/logo1.png";
+const HEADER_LOGO = `${import.meta.env.BASE_URL}assets/images/logo.png`;
+const SIDEBAR_LOGO = `${import.meta.env.BASE_URL}assets/images/logo1.png`;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
