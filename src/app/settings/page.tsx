@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { calculateBmi, convertCmToUnits, convertKgToUnits, getBmiInsight } from "@/lib/bmi";
+import { calculateBmi, convertCmToUnits, convertKgToUnits, getBmiInsight, getBmiRiskToneClass } from "@/lib/bmi";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import type { AppExportPayload } from "@/lib/types";
@@ -11,6 +11,7 @@ import { useAppStore } from "@/state/store";
 export default function SettingsPage() {
   const [searchParams] = useSearchParams();
   const user = useAppStore((state) => state.currentUser);
+  const recentWeight = useAppStore((state) => state.progressEntries[0]?.weight);
   const darkMode = useAppStore((state) => state.ui.darkMode);
   const settings = useAppStore((state) => state.settings);
   const setDarkMode = useAppStore((state) => state.setDarkMode);
@@ -29,7 +30,8 @@ export default function SettingsPage() {
   const profileUpdated = searchParams.get("updated") === "profile";
   const units = settings?.units ?? "metric";
   const bmiProfile = settings?.bmiThresholdProfile ?? "standard";
-  const bmi = user ? calculateBmi(user.height, user.weight) : null;
+  const bmiWeightKg = recentWeight ?? user?.weight ?? 0;
+  const bmi = user ? calculateBmi(user.height, bmiWeightKg) : null;
   const bmiInsight = getBmiInsight({ age: user?.age ?? 25, bmi, profile: bmiProfile });
   const userHeight = user ? convertCmToUnits(user.height, units) : null;
   const userWeight = user ? convertKgToUnits(user.weight, units) : null;
@@ -49,7 +51,12 @@ export default function SettingsPage() {
             ? `${user.name} • ${user.age} yrs • ${userHeight} ${units === "imperial" ? "in" : "cm"} • ${userWeight} ${units === "imperial" ? "lb" : "kg"}`
             : "No profile setup yet"}
         </CardDescription>
-        {user ? <CardDescription className="mt-1">BMI: {bmi ?? "--"} • {bmiInsight.label} • Risk: {bmiInsight.risk}</CardDescription> : null}
+        {user ? (
+          <CardDescription className="mt-1">
+            BMI: {bmi ?? "--"} • {bmiInsight.label} ({bmiInsight.range}) • <span className={getBmiRiskToneClass(bmiInsight.risk)}>Risk: {bmiInsight.risk}</span>
+          </CardDescription>
+        ) : null}
+        {user && recentWeight ? <CardDescription className="mt-1">Based on latest progress weight entry.</CardDescription> : null}
         <Link to="/settings/profile" className="mt-3 block">
           <Button className="w-full" variant="outline">
             Edit Profile

@@ -1,5 +1,7 @@
 import type { BmiThresholdProfile } from "@/lib/types";
 
+export type BmiRisk = "low" | "neutral" | "high";
+
 const CM_TO_IN = 0.3937008;
 const KG_TO_LB = 2.2046226;
 
@@ -36,6 +38,7 @@ export function getBmiInsight(params: { age: number; bmi: number | null; profile
     return {
       label: "N/A",
       detail: "Enter valid height and weight to calculate BMI.",
+      range: "-",
       risk: "neutral" as const,
       tone: "muted" as const,
     };
@@ -45,6 +48,7 @@ export function getBmiInsight(params: { age: number; bmi: number | null; profile
     return {
       label: "Teen BMI",
       detail: "Use BMI-for-age percentile charts for ages under 20.",
+      range: "Percentile based",
       risk: "neutral" as const,
       tone: "warning" as const,
     };
@@ -59,6 +63,7 @@ export function getBmiInsight(params: { age: number; bmi: number | null; profile
     return {
       label: "Underweight",
       detail: "Consider balanced nutrition and consult guidance if needed.",
+      range: `< ${thresholds.underweight}`,
       risk: "neutral" as const,
       tone: "warning" as const,
     };
@@ -68,6 +73,7 @@ export function getBmiInsight(params: { age: number; bmi: number | null; profile
     return {
       label: "Healthy range",
       detail: "Maintain consistency with activity and nutrition habits.",
+      range: `${thresholds.underweight} - ${(thresholds.healthy - 0.1).toFixed(1)}`,
       risk: "low" as const,
       tone: "good" as const,
     };
@@ -77,6 +83,7 @@ export function getBmiInsight(params: { age: number; bmi: number | null; profile
     return {
       label: "Overweight range",
       detail: "Focus on steady activity and nutrition consistency.",
+      range: `${thresholds.healthy} - ${(thresholds.overweight - 0.1).toFixed(1)}`,
       risk: "neutral" as const,
       tone: "warning" as const,
     };
@@ -85,7 +92,14 @@ export function getBmiInsight(params: { age: number; bmi: number | null; profile
   return {
     label: "Obesity range",
     detail: "Use this as a screening signal; not a diagnosis.",
+    range: `>= ${thresholds.overweight}`,
     risk: "high" as const,
     tone: "high" as const,
   };
+}
+
+export function getBmiRiskToneClass(risk: BmiRisk) {
+  if (risk === "low") return "text-emerald-700 dark:text-emerald-300";
+  if (risk === "high") return "text-rose-700 dark:text-rose-300";
+  return "text-amber-700 dark:text-amber-300";
 }

@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Flame, Timer, Utensils } from "lucide-react";
-import { calculateBmi, getBmiInsight } from "@/lib/bmi";
+import { calculateBmi, getBmiInsight, getBmiRiskToneClass } from "@/lib/bmi";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MediaCard } from "@/components/feature/media-card";
@@ -129,8 +129,8 @@ export default function DashboardPage() {
           <div className="rounded-xl bg-zinc-100 p-2 text-center dark:bg-zinc-800">
             <p className="text-zinc-500 dark:text-zinc-400">BMI</p>
             <p className="text-lg font-bold">{bmi ?? "--"}</p>
-            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{bmiInsight.label}</p>
-            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">Risk: {bmiInsight.risk}</p>
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400">{bmiInsight.label} ({bmiInsight.range})</p>
+            <p className={`text-[10px] font-medium ${getBmiRiskToneClass(bmiInsight.risk)}`}>Risk: {bmiInsight.risk}</p>
           </div>
         </div>
       </Card>

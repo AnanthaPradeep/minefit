@@ -5,8 +5,8 @@ export function SplashScreen() {
     return (
         <div className="flex min-h-screen items-center justify-center">
             <div className="flex w-full max-w-sm flex-col items-center justify-center text-center">
-                <img src={logo} alt="MineFit logo" className="block h-24 w-auto rounded-xl object-contain" />
-                <img src={logoWordmark} alt="MineFit wordmark" className="-mt-6 block h-12 w-auto object-contain" />
+                <img src={logo} alt="MineFit logo" className="block h-50 w-auto rounded-xl object-contain" />
+                <img src={logoWordmark} alt="MineFit wordmark" className="-mt-20 block h-60 w-auto object-contain" />
             </div>
         </div>
     );

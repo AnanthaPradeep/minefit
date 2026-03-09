@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Activity, Bell, Dumbbell, House, Menu, Salad, Settings, Waves, X } from "lucide-react";
-import { calculateBmi, getBmiInsight } from "@/lib/bmi";
+import { calculateBmi, getBmiInsight, getBmiRiskToneClass } from "@/lib/bmi";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/state/store";
@@ -82,7 +82,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {user ? (
           <div className="mb-4 rounded-xl bg-zinc-100 px-3 py-2 text-xs dark:bg-zinc-800">
             <p className="font-semibold text-zinc-700 dark:text-zinc-200">BMI {bmi ?? "--"}</p>
-            <p className="text-zinc-500 dark:text-zinc-400">{bmiInsight.label} • Risk: {bmiInsight.risk}</p>
+            <p className={`font-medium ${getBmiRiskToneClass(bmiInsight.risk)}`}>{bmiInsight.label} ({bmiInsight.range}) • Risk: {bmiInsight.risk}</p>
           </div>
         ) : null}
 
@@ -213,7 +213,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {user ? (
               <div className="mb-4 rounded-xl bg-zinc-100 px-3 py-2 text-xs dark:bg-zinc-800">
                 <p className="font-semibold text-zinc-700 dark:text-zinc-200">BMI {bmi ?? "--"}</p>
-                <p className="text-zinc-500 dark:text-zinc-400">{bmiInsight.label} • Risk: {bmiInsight.risk}</p>
+                <p className={`font-medium ${getBmiRiskToneClass(bmiInsight.risk)}`}>{bmiInsight.label} ({bmiInsight.range}) • Risk: {bmiInsight.risk}</p>
               </div>
             ) : null}
 

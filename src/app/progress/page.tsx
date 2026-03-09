@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { calculateBmi, convertKgToUnits, convertUnitsToKg, getBmiInsight } from "@/lib/bmi";
+import { calculateBmi, convertKgToUnits, convertUnitsToKg, getBmiInsight, getBmiRiskToneClass } from "@/lib/bmi";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -107,8 +107,8 @@ export default function ProgressPage() {
         <Card>
           <CardTitle>Current BMI</CardTitle>
           <p className="mt-2 text-3xl font-bold">{currentBmi ?? "--"}</p>
-          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{bmiInsight.label}</p>
-          <p className="text-xs text-zinc-600 dark:text-zinc-300">Risk: {bmiInsight.risk}</p>
+          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{bmiInsight.label} ({bmiInsight.range})</p>
+          <p className={`text-xs font-medium ${getBmiRiskToneClass(bmiInsight.risk)}`}>Risk: {bmiInsight.risk}</p>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">{bmiInsight.detail}</p>
         </Card>
 

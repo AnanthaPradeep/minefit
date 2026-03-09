@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { calculateBmi, getBmiInsight } from "@/lib/bmi";
+import { calculateBmi, getBmiInsight, getBmiRiskToneClass } from "@/lib/bmi";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -59,6 +59,7 @@ function toMetricWeight(weightInput: number, units: Units) {
 export default function ProfileSettingsPage() {
   const navigate = useNavigate();
   const user = useAppStore((state) => state.currentUser);
+  const recentWeight = useAppStore((state) => state.progressEntries[0]?.weight);
   const settingsUnits = useAppStore((state) => state.settings?.units ?? "metric");
   const bmiProfile = useAppStore((state) => state.settings?.bmiThresholdProfile ?? "standard");
   const createOrUpdateProfile = useAppStore((state) => state.createOrUpdateProfile);
@@ -104,8 +105,8 @@ export default function ProfileSettingsPage() {
 
   const heightLabel = form.units === "imperial" ? "Height (in)" : "Height (cm)";
   const weightLabel = form.units === "imperial" ? "Weight (lb)" : "Weight (kg)";
-  const previewBmi = calculateBmi(toMetricHeight(Number(form.height), form.units), toMetricWeight(Number(form.weight), form.units));
-  const previewBmiInsight = getBmiInsight({ age: Number(form.age), bmi: previewBmi, profile: bmiProfile });
+  const currentBmi = calculateBmi(user.height, recentWeight ?? user.weight);
+  const currentBmiInsight = getBmiInsight({ age: user.age, bmi: currentBmi, profile: bmiProfile });
 
   const validate = (candidate: ProfileForm) => {
     const nextErrors: Partial<Record<keyof ProfileForm, string>> = {};
@@ -157,9 +158,10 @@ export default function ProfileSettingsPage() {
 
       <Card>
         <div className="mb-3 rounded-xl bg-zinc-100 p-3 text-sm dark:bg-zinc-800">
-          <p className="font-semibold">BMI Preview: {previewBmi ?? "--"} • {previewBmiInsight.label}</p>
-          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">Risk: {previewBmiInsight.risk}</p>
-          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">{previewBmiInsight.detail}</p>
+          <p className="font-semibold">Current BMI: {currentBmi ?? "--"} • {currentBmiInsight.label} ({currentBmiInsight.range})</p>
+          <p className={`mt-1 text-xs font-medium ${getBmiRiskToneClass(currentBmiInsight.risk)}`}>Current Risk: {currentBmiInsight.risk}</p>
+          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">Based on latest progress weight entry.</p>
+          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">{currentBmiInsight.detail}</p>
         </div>
 
         <div className="mb-4 flex items-center gap-3">
